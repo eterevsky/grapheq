@@ -1,0 +1,8 @@
+[package]
+name = "grapheq"
+version = "0.1.0"
+authors = ["olege"]
+edition = "2018"
+
+[dependencies]
+image = "*"

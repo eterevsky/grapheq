@@ -13,4 +13,14 @@ fn main() {
         &style
     );
     buffer.save("b.png").unwrap()
+
+    // let buffer = grapheq::plot(
+    //     &|x, y| x*x + y*y - 1. + 0.1 * (10. * y.atan2(x)).sin(),
+    //     &|x, y| (
+    //         2. * x + 0.1 * (10. * y.atan2(x)).cos() * 10. / (1. + y*y / x*x) * (-1. / x * x),
+    //         2. * y + 0.1 * (10. * y.atan2(x)).cos() * 10. / (1. + y*y / x*x),
+    //     ),
+    //     &style
+    // );
+    // buffer.save("c.png").unwrap()
 }

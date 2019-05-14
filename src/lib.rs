@@ -20,7 +20,8 @@ where
     // Background color
     bg: P,
 
-    // TODO: add the width of the line
+    // Width of the line in the graph coordinates.
+    width: f64,
 
     // Coefficients for translation from pixel coordinates to the graph coordinates
     scale: f64,
@@ -43,6 +44,7 @@ where
             fg: P::from_channels(0, 0, 0, 255),
             bg: P::from_channels(255, 255, 255, 255),
             scale: 1.,
+            width: 0.001,
             xoffset: 0.,
             yoffset: 0.,
         };
@@ -69,7 +71,40 @@ where
         (self.scale * x + self.xoffset, self.scale * y + self.yoffset)
     }
 
-    // TODO: Setters for the parameters.
+    pub fn set_xmin(mut self, v: f64) -> Self {
+        self.xmin = v;
+        self.update_conversion();
+        self
+    }
+    pub fn set_xmax(mut self, v: f64) -> Self {
+        self.xmax = v;
+        self.update_conversion();
+        self
+    }
+    pub fn set_ymin(mut self, v: f64) -> Self {
+        self.ymin = v;
+        self.update_conversion();
+        self
+    }
+    pub fn set_ymax(mut self, v: f64) -> Self {
+        self.ymax = v;
+        self.update_conversion();
+        self
+    }
+    pub fn set_width(mut self, v: f64) -> Self {
+        self.width = v;
+        self
+    }
+    pub fn set_image_width(mut self, v: u32) -> Self {
+        self.wpixels = v;
+        self.update_conversion();
+        self
+    }
+    pub fn set_image_height(mut self, v: u32) -> Self {
+        self.hpixels = v;
+        self.update_conversion();
+        self
+    }
 }
 
 pub fn plot<F, G, P>(f: &F, gradient: &G, style: &Style<P>) -> ImageBuffer<P, Vec<u8>>
@@ -92,8 +127,7 @@ where
                 let (x, y) = style.pixel_to_coords(px + dx as f64 / 16., py + dy as f64 / 16.);
                 let (gx, gy) = gradient(x, y);
                 let gradient_abs = (gx * gx + gy * gy).sqrt();
-                // TODO: 0.001 is the width of the line in graph coordinates. Should move it to the params.
-                if f(x, y).abs() < 0.001 * gradient_abs {
+                if f(x, y).abs() < style.width * gradient_abs {
                     count += 1;
                 }
             }

@@ -107,6 +107,18 @@ where
     }
 }
 
+// Checks whether there is at least one root of f(x, y) at the distance at most
+// `max_distance` from the point (x0, y0).
+fn has_near_root<F, G>(f: &F, gradient: &G, x0: f64, y0: f64, max_distance: f64) -> bool
+where
+    F: Fn(f64, f64) -> f64,
+    G: Fn(f64, f64) -> (f64, f64) {
+    let (gx, gy) = gradient(x0, y0);
+    let gradient_abs = (gx * gx + gy * gy).sqrt();
+    f(x0, y0).abs() < max_distance * gradient_abs
+}
+
+// Plots the graph of f(x, y) = 0.
 pub fn plot<F, G, P>(f: &F, gradient: &G, style: &Style<P>) -> ImageBuffer<P, Vec<u8>>
 where
     F: Fn(f64, f64) -> f64,
@@ -119,15 +131,14 @@ where
         let px = px as f64;
         let py = py as f64;
 
-        // TODO: Add a heuristic to skip subpixel iterations when we are far away from any roots (gradient is big, and second derivatives are low).
+        // TODO: Add a heuristic to skip subpixel iterations when we are far away from any roots
+        // (gradient and second derivatives are low).
 
         let mut count = 0;
         for dx in 0..16 {
             for dy in 0..16 {
                 let (x, y) = style.pixel_to_coords(px + dx as f64 / 16., py + dy as f64 / 16.);
-                let (gx, gy) = gradient(x, y);
-                let gradient_abs = (gx * gx + gy * gy).sqrt();
-                if f(x, y).abs() < style.width * gradient_abs {
+                if has_near_root(f, gradient, x, y, style.width) {
                     count += 1;
                 }
             }
